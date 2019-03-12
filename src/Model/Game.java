@@ -8,10 +8,10 @@ package Model;
 import Model.Ship.Direction;
 import Model.Ship.MovementType;
 import Model.Ship.Ship;
-import Model.Util.ActionType;
-import Model.Util.GameState;
-import Model.Util.ServerOptions;
-import Model.Util.TileType;
+import Util.ActionType;
+import Util.GameState;
+import Util.ServerOptions;
+import Util.TileType;
 import java.util.EnumMap;
 import java.util.Map;
 

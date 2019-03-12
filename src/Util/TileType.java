@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model.Util;
+package Util;
 
 /**
  *
  * @author kismo
  */
-public enum ServerOptions {
-    FOG,MANEUVER,PICK_UP
+public enum TileType {
+    WATER,ROCK,CURRENT_NORTH,CURRENT_SOUTH,CURRENT_EAST,CURRENT_WEST
 }

@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model.Util;
+package Util;
 
 /**
  *
  * @author kismo
  */
-public enum GameState {
-    INICIALIZATION,READY,GAME
+public enum MessageType {
+    FIRST_GAMESTATE,GAMESTATE,OPTION,READY,STARTGAME,NONE
 }

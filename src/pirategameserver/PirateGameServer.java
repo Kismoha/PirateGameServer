@@ -7,8 +7,8 @@ package pirategameserver;
 
 import Model.Game;
 import Model.Player;
-import Model.Util.GameState;
-import Model.Util.MessageType;
+import Util.GameState;
+import Util.MessageType;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
