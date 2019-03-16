@@ -29,8 +29,10 @@ public class Sloop extends Ship{
         this.initialMovementAmmount = 3;
         this.movementAmmount = new EnumMap<>(MovementType.class);
         
-        this.setPosX(0);
-        this.setPosY(0);
+        this.posX = 0;
+        this.posY = 0;
+        
+        this.direction = new Direction("SOUTH");
         
         init();
         

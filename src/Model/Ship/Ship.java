@@ -213,7 +213,7 @@ public abstract class Ship {
     }
 
     public Direction getDirection() {
-        return direction;
+        return new Direction(direction);
     }
 
     public void setDirection(Direction direction) {

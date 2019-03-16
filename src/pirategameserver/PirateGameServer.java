@@ -9,9 +9,7 @@ import Model.Game;
 import Model.Player;
 import Util.GameState;
 import Util.MessageType;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -43,7 +41,8 @@ public class PirateGameServer {
         game.setState(GameState.READY);
         //Sends out gameState
         System.out.println("Sending Game State");
-        messageSenderHelper(MessageType.FIRST_GAMESTATE, game.genMinGame());
+        String minGame = game.genMinGame();
+        messageSenderHelper(MessageType.FIRST_GAMESTATE, minGame, minGame);
         //Waits for clients to be ready
         System.out.println("Waiting fo Ready");
         waitForClientReady();
@@ -65,12 +64,14 @@ public class PirateGameServer {
 
     private void start() {
         System.out.println("Sending START");
-        messageSenderHelper(MessageType.STARTGAME, "YOU_CAN_START_THE_GAME");
+        messageSenderHelper(MessageType.STARTGAME, "YOU_CAN_START_THE_GAME",
+                "YOU_CAN_START_THE_GAME");
         while (true) {
             readFromClients();
             game.simulateTurn();
-            writeGameStateToClient(game.getPlayerOne());
-            writeGameStateToClient(game.getPlayerTwo());
+            messageSenderHelper(MessageType.GAMESTATE,
+                    game.getPlayerOne().getMoveSet(),
+                    game.getPlayerTwo().getMoveSet());
         }
     }
 
@@ -157,38 +158,28 @@ public class PirateGameServer {
         return message;
     }
 
-    private void writeToClients(String message) {
+    private void writeToClients(String message1, String message2) {
         try {
             PrintWriter out = game.getPlayerOne().getOut();
-            System.out.println("Sending message: " + message);
-            out.println(message);
+            System.out.println("Sending message: " + message1);
+            out.println(message1);
             out.flush();
         } catch (Exception e) {
 
         }
         try {
             PrintWriter out = game.getPlayerTwo().getOut();
-            System.out.println("Sending message: " + message);
-            out.println(message);
-            out.flush();
-        } catch (Exception e) {
-
-        }
-    }
-    private void writeGameStateToClient(Player player){
-        try {
-            PrintWriter out = player.getOut();
-            System.out.println("Sending message: " + player.getMoveSet());
-            out.println(player.getMoveSet());
+            System.out.println("Sending message: " + message2);
+            out.println(message2);
             out.flush();
         } catch (Exception e) {
 
         }
     }
 
-    private void messageSenderHelper(MessageType type, String message) {
+    private void messageSenderHelper(MessageType type, String message1, String message2) {
         String messageStart = type.toString() + ":";
-        writeToClients(messageStart + message);
+        writeToClients(messageStart + message1,messageStart + message2);
 
     }
 

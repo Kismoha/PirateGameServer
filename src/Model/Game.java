@@ -46,7 +46,7 @@ public class Game {
         state = GameState.INICIALIZATION;
     }
 
-    //Leszimulál eegy kört
+    //Leszimulál egy kört
     public void simulateTurn() {
         StringBuilder set1 = new StringBuilder("");
         StringBuilder set2 = new StringBuilder("");
@@ -55,12 +55,10 @@ public class Game {
 
         for (int i = 0; i < Ship.MAX_MOVEMENT; i++) {
             simulateSegment(actions1[i], actions2[i], set1, set2);
-            set1.append("-");
-            set2.append("-");
         }
 
-        playerOne.setMoveSet(set1.toString());
-        playerTwo.setMoveSet(set2.toString());
+        playerOne.setMoveSet(set1.deleteCharAt(set1.length() - 1).toString());
+        playerTwo.setMoveSet(set2.deleteCharAt(set2.length() - 1).toString());
     }
 
     //leszimulál egy lépést
@@ -70,27 +68,20 @@ public class Game {
         String[] actions2 = move2.split(";");//Structure: [MOVEMENT,ACTION,ACTION]
         int[][] route1 = calcMovementRoute(MovementType.valueOf(actions1[0]), playerOne);
         int[][] route2 = calcMovementRoute(MovementType.valueOf(actions2[0]), playerTwo);
-        int POx0 = route1[0][0],
-                POy0 = route1[0][1],
-                POx1 = route1[1][0],
-                POy1 = route1[1][1],
-                POx2 = route1[2][0],
-                POy2 = route1[2][1],
-                PTx0 = route2[0][0],
-                PTy0 = route2[0][1],
-                PTx1 = route2[1][0],
-                PTy1 = route2[1][1],
-                PTx2 = route2[2][0],
-                PTy2 = route2[2][1];
+
         boolean contact1 = false, contact2 = false;
-        checkMovementContact(MovementType.valueOf(actions1[0]),
-                POx1, POy1, PTx1, PTy1, 1, playerOne, set1, contact1);
-        checkMovementContact(MovementType.valueOf(actions2[0]),
-                PTx1, PTy1, POx1, POy1, 1, playerTwo, set2, contact2);
-        checkMovementContact(MovementType.valueOf(actions1[0]),
-                POx2, POy2, PTx2, PTy2, 2, playerOne, set1, contact1);
-        checkMovementContact(MovementType.valueOf(actions2[0]),
-                PTx2, PTy2, POx2, POy2, 2, playerTwo, set2, contact2);
+        contact1 = checkMovementContact(MovementType.valueOf(actions1[0]),
+                route1, route2, 1, playerOne, set1, contact1);
+        contact2 = checkMovementContact(MovementType.valueOf(actions2[0]),
+                route2, route1, 1, playerTwo, set2, contact2);
+        if (!contact1) {
+            checkMovementContact(MovementType.valueOf(actions1[0]),
+                    route1, route2, 2, playerOne, set1, contact1);
+        }
+        if (!contact2) {
+            checkMovementContact(MovementType.valueOf(actions2[0]),
+                    route2, route1, 2, playerTwo, set2, contact2);
+        }
         //Action feldolgozások
         simulateActions(ActionType.valueOf(actions1[1]),
                 ActionType.valueOf(actions1[2]), playerOne, playerTwo, set1);
@@ -98,16 +89,25 @@ public class Game {
                 ActionType.valueOf(actions2[2]), playerTwo, playerOne, set2);
     }
 
-    private void checkMovementContact(MovementType move, int x1, int y1,
-            int x2, int y2, int counter, Player player, StringBuilder set, boolean contact) {
-        if ((x1 < 0 || y1 < 0 || x1 >= MAP_WIDTH || y1 >= MAP_HEIGHT
-                || map[x1][y1] == TileType.ROCK
-                || (x1 == x2 && y1 == y2)) && !contact) {
+    private boolean checkMovementContact(MovementType move, int[][] route1, int[][] route2,
+            int counter, Player player, StringBuilder set, boolean contact) {
+        if ((route1[counter][0] < 0
+                || route1[counter][1] < 0
+                || route1[counter][0] >= MAP_WIDTH
+                || route1[counter][1] >= MAP_HEIGHT
+                || map[route1[counter][0]][route1[counter][1]] == TileType.ROCK
+                || (route1[counter][0] == route2[counter][0]
+                && route1[counter][1] == route2[counter][1])
+                || crossContactDetection(route1, route2, counter))
+                && !contact) {
             switch (move) {
                 case NONE:
                     processMove(MovementType.NONE, set, player);
                     break;
                 case FORWARD:
+                    if (counter == 2) {
+                        return true;
+                    }
                     processMove(MovementType.FORWARD_CRASH, set, player);
                     break;
                 case RIGHT:
@@ -119,18 +119,28 @@ public class Game {
                             : MovementType.LEFT_MID_CRASH, set, player);
                     break;
             }
-            contact = true;
-        } else if (counter == 2 && !contact) {
-            processMove(move, set, player);
+            return true;
         }
+        if (counter == 2 && !contact) {
+            processMove(move, set, player);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean crossContactDetection(int[][] route1, int[][] route2, int counter) {
+        return route1[counter][0] == route2[counter-1][0]
+                && route1[counter][1] == route2[counter-1][1]
+                && route2[counter][0] == route1[counter-1][0]
+                && route2[counter][1] == route1[counter-1][1];
     }
 
     private void processMove(MovementType type, StringBuilder set, Player player) {
         player.getShip().move(type);
         set.append(type).
-                append(":").
+                append(".").
                 append(player.getShip().getPosX()).
-                append(":").
+                append(".").
                 append(player.getShip().getPosY()).
                 append(";");
     }
@@ -163,7 +173,8 @@ public class Game {
                 if (!outOfBounds && map[x][y] == TileType.ROCK) {
                     set.append(isLeft ? ActionType.SHOOT_HIT_LEFT_1
                             : ActionType.SHOOT_HIT_RIGHT_1).append(";");
-                } else if (!outOfBounds && x == otherPlayer.getShip().getPosX()
+                }
+                if (!outOfBounds && x == otherPlayer.getShip().getPosX()
                         && y == otherPlayer.getShip().getPosY()) {
                     set.append(isLeft ? ActionType.SHOOT_HIT_LEFT_1
                             : ActionType.SHOOT_HIT_RIGHT_1).append(";");
@@ -195,6 +206,11 @@ public class Game {
                 }
                 break;
         }
+        if (!isLeft) {
+            set.deleteCharAt(set.length() - 1);
+            set.append("-");
+
+        }
     }
 
     //Kiszámítja egy lépés útját a pályán (ütközéseket figyelmen kívül hagyva)
@@ -211,18 +227,26 @@ public class Game {
                 route[2] = route[1];
                 break;
             case RIGHT:
-                route[1][0] = x + dir.getX();
-                route[1][1] = y + dir.getY();
+                x += dir.getX();
+                y += dir.getY();
+                route[1][0] = x;
+                route[1][1] = y;
                 dir.turnRight();
-                route[2][0] = x + dir.getX();
-                route[2][1] = y + dir.getY();
+                x += dir.getX();
+                y += dir.getY();
+                route[2][0] = x;
+                route[2][1] = y;
                 break;
             case LEFT:
-                route[1][0] = x + dir.getX();
-                route[1][1] = y + dir.getY();
+                x += dir.getX();
+                y += dir.getY();
+                route[1][0] = x;
+                route[1][1] = y;
                 dir.turnLeft();
-                route[2][0] = x + dir.getX();
-                route[2][1] = y + dir.getY();
+                x += dir.getX();
+                y += dir.getY();
+                route[2][0] = x;
+                route[2][1] = y;
                 break;
         }
         return route;
@@ -250,6 +274,12 @@ public class Game {
         }
         playerOne.getShip().setDirection(genStartingDir());
         playerTwo.getShip().setDirection(genStartingDir());
+
+        playerOne.getShip().setPosX(0);
+        playerOne.getShip().setPosY(0);
+        playerTwo.getShip().setPosX(3);
+        playerTwo.getShip().setPosY(0);
+
     }
 
     private Direction genStartingDir() {
