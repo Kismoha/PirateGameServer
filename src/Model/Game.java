@@ -138,9 +138,9 @@ public class Game {
     private void processMove(MovementType type, StringBuilder set, Player player) {
         player.getShip().move(type);
         set.append(type).
-                append(".").
+                append(",").
                 append(player.getShip().getPosX()).
-                append(".").
+                append(",").
                 append(player.getShip().getPosY()).
                 append(";");
     }

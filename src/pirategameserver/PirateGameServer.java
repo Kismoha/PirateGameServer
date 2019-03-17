@@ -47,7 +47,7 @@ public class PirateGameServer {
         System.out.println("Waiting fo Ready");
         waitForClientReady();
         game.setState(GameState.GAME);
-        if(game.getPlayerOne().isReady() && game.getPlayerTwo().isReady()){
+        if (game.getPlayerOne().isReady() && game.getPlayerTwo().isReady()) {
             start();
         }
     }
@@ -69,9 +69,10 @@ public class PirateGameServer {
         while (true) {
             readFromClients();
             game.simulateTurn();
-            messageSenderHelper(MessageType.GAMESTATE,
-                    game.getPlayerOne().getMoveSet(),
-                    game.getPlayerTwo().getMoveSet());
+            String message = game.getPlayerOne().getMoveSet()
+                    + "/"
+                    + game.getPlayerTwo().getMoveSet();
+            messageSenderHelper(MessageType.GAMESTATE,message,message);
         }
     }
 
@@ -179,7 +180,7 @@ public class PirateGameServer {
 
     private void messageSenderHelper(MessageType type, String message1, String message2) {
         String messageStart = type.toString() + ":";
-        writeToClients(messageStart + message1,messageStart + message2);
+        writeToClients(messageStart + message1, messageStart + message2);
 
     }
 
