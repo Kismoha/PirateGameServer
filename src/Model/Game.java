@@ -21,8 +21,8 @@ import java.util.Map;
  */
 public class Game {
 
-    public static final int MAP_HEIGHT = 5;
-    public static final int MAP_WIDTH = 5;
+    public static final int MAP_HEIGHT = 50;
+    public static final int MAP_WIDTH = 50;
 
     private TileType[][] map = new TileType[MAP_HEIGHT][MAP_WIDTH];
 
@@ -129,10 +129,10 @@ public class Game {
     }
 
     private boolean crossContactDetection(int[][] route1, int[][] route2, int counter) {
-        return route1[counter][0] == route2[counter-1][0]
-                && route1[counter][1] == route2[counter-1][1]
-                && route2[counter][0] == route1[counter-1][0]
-                && route2[counter][1] == route1[counter-1][1];
+        return route1[counter][0] == route2[counter - 1][0]
+                && route1[counter][1] == route2[counter - 1][1]
+                && route2[counter][0] == route1[counter - 1][0]
+                && route2[counter][1] == route1[counter - 1][1];
     }
 
     private void processMove(MovementType type, StringBuilder set, Player player) {
@@ -275,10 +275,10 @@ public class Game {
         playerOne.getShip().setDirection(genStartingDir());
         playerTwo.getShip().setDirection(genStartingDir());
 
-        playerOne.getShip().setPosX(0);
-        playerOne.getShip().setPosY(0);
-        playerTwo.getShip().setPosX(3);
-        playerTwo.getShip().setPosY(0);
+        playerOne.getShip().setPosX(2);
+        playerOne.getShip().setPosY(2);
+        playerTwo.getShip().setPosX(4);
+        playerTwo.getShip().setPosY(4);
 
     }
 
@@ -308,8 +308,10 @@ public class Game {
         return MAP_HEIGHT + ";" + MAP_WIDTH + "-" + mapString.toString() + "-"
                 + playerOne.getShip().getPosX() + ";"
                 + playerOne.getShip().getPosY() + ";"
+                + playerOne.getShip().getDirection().getDir() + ";"
                 + playerTwo.getShip().getPosX() + ";"
-                + playerTwo.getShip().getPosY();
+                + playerTwo.getShip().getPosY() + ";"
+                + playerTwo.getShip().getDirection().getDir();
     }
 
     public TileType[][] getMap() {
