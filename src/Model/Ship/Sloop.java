@@ -16,8 +16,8 @@ public class Sloop extends Ship{
     public Sloop(){
         this.type = ShipType.SLOOP;
         
-        this.maxHealth = 6;
-        this.currentHealth = 6;
+        this.damageThreshold = 6;
+        this.currentDamage = 0;
         
         this.shotPerAction = 1;
         this.maxLoadedGuns = 6;

@@ -19,8 +19,8 @@ public abstract class Ship {
 
     protected ShipType type;
     //health
-    protected int currentHealth;
-    protected int maxHealth;
+    protected int damageThreshold;
+    protected int currentDamage;
     //sepcial actions
     protected int shotPerAction;
     protected int maxLoadedGuns;
@@ -99,7 +99,7 @@ public abstract class Ship {
     }
     
     public void sufferDamage(int dmg){
-        this.currentHealth -= dmg;
+        this.currentDamage += dmg;
     }
     
     protected void initMovementAmmount(){
@@ -116,21 +116,23 @@ public abstract class Ship {
         this.type = type;
     }
 
-    public int getCurrentHealth() {
-        return currentHealth;
+    public int getDamageThreshold() {
+        return damageThreshold;
     }
 
-    public void setCurrentHealth(int currentHealth) {
-        this.currentHealth = currentHealth;
+    public void setDamageThreshold(int damageThreshold) {
+        this.damageThreshold = damageThreshold;
     }
 
-    public int getMaxHealth() {
-        return maxHealth;
+    public int getCurrentDamage() {
+        return currentDamage;
     }
 
-    public void setMaxHealth(int maxHealth) {
-        this.maxHealth = maxHealth;
+    public void setCurrentDamage(int currentDamage) {
+        this.currentDamage = currentDamage;
     }
+
+    
 
     public int getShotPerAction() {
         return shotPerAction;
