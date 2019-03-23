@@ -36,6 +36,7 @@ public class Game {
     private GameState state;
 
     public Game() {
+        map = new TileType[MAP_WIDTH][MAP_HEIGHT];
         options = new EnumMap(ServerOptions.class);
         options.put(ServerOptions.FOG, Boolean.TRUE);
         options.put(ServerOptions.MANEUVER, Boolean.TRUE);
@@ -267,11 +268,9 @@ public class Game {
     }
 
     public void generateMap() {
-        for (int i = 0; i < MAP_HEIGHT; i++) {
-            for (int j = 0; j < MAP_WIDTH; j++) {
-                map[i][j] = TileType.WATER;
-            }
-        }
+        MapGenerator mapGen = new MapGenerator();
+        mapGen.genMap();
+        map = mapGen.getMap();
         playerOne.getShip().setDirection(genStartingDir());
         playerTwo.getShip().setDirection(genStartingDir());
 
