@@ -3,8 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model.Ship;
+package Model.Map_Elements;
 
+import Model.Direction;
+import Model.Enums.ShipType;
+import Model.Enums.MovementType;
 import java.util.EnumMap;
 
 /**

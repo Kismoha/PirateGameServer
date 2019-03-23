@@ -7,7 +7,7 @@ package Model;
 
 import static Model.Game.MAP_HEIGHT;
 import static Model.Game.MAP_WIDTH;
-import Util.TileType;
+import Model.Enums.TileType;
 import java.util.Random;
 
 /**
@@ -16,19 +16,14 @@ import java.util.Random;
  */
 public class MapGenerator {
 
-    private final int rockCount = 20;
+    private final int rockCount = (int) Math.floor((MAP_WIDTH * MAP_HEIGHT) / 125);
     private final int rockChanceLowerLimit = 0;
     private final int rockChanceUpperLimit = 10000;
     private final int rockChanceLoss = 2500;
     private final int rockChanceThreshold;
     private final int rockBaseChance;
 
-    private final int currentCount = 10;
-    private final int currentChanceLowerLimit = 0;
-    private final int currentChanceUpperLimit = 10000;
-    private final int currentChanceLoss = 100;
-    private final int currentChanceThreshold;
-    private final int currentBaseChance;
+    private final int currentCount = (int) Math.floor((MAP_WIDTH * MAP_HEIGHT) / 125);
 
     private int[][] rockStartNodes;
     private TileType[][] map;
@@ -37,10 +32,6 @@ public class MapGenerator {
         rockChanceThreshold
                 = (rockChanceUpperLimit - rockChanceLowerLimit) / 8;
         rockBaseChance = rockChanceUpperLimit - rockChanceThreshold;
-
-        currentChanceThreshold
-                = (currentChanceUpperLimit - currentChanceLowerLimit) / 2;
-        currentBaseChance = currentChanceUpperLimit - currentChanceThreshold;
 
         map = new TileType[MAP_HEIGHT][MAP_WIDTH];
         rockStartNodes = new int[rockCount][2];

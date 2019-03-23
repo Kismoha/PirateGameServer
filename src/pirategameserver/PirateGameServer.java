@@ -7,8 +7,8 @@ package pirategameserver;
 
 import Model.Game;
 import Model.Player;
-import Util.GameState;
-import Util.MessageType;
+import Model.Enums.GameState;
+import Model.Enums.MessageType;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;

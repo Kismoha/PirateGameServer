@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model.Ship;
+package Model.Enums;
 
 /**
  *
  * @author kismo
  */
-public enum ShipType {
-    SLOOP,CUTTER,LONGSHIP
+public enum TileType {
+    WATER,ROCK,CURRENT_NORTH,CURRENT_SOUTH,CURRENT_EAST,CURRENT_WEST
 }

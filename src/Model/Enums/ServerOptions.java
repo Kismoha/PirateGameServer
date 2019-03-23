@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Util;
+package Model.Enums;
 
 /**
  *
  * @author kismo
  */
-public enum MessageType {
-    FIRST_GAMESTATE,GAMESTATE,OPTION,READY,STARTGAME,NONE
+public enum ServerOptions {
+    FOG,MANEUVER,PICK_UP
 }

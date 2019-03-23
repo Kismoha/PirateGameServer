@@ -5,7 +5,7 @@
  */
 package Model;
 
-import Model.Ship.Sloop;
+import Model.Map_Elements.Sloop;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

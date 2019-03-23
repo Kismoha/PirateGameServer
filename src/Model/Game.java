@@ -5,13 +5,12 @@
  */
 package Model;
 
-import Model.Ship.Direction;
-import Model.Ship.MovementType;
-import Model.Ship.Ship;
-import Util.ActionType;
-import Util.GameState;
-import Util.ServerOptions;
-import Util.TileType;
+import Model.Enums.MovementType;
+import Model.Map_Elements.Ship;
+import Model.Enums.ActionType;
+import Model.Enums.GameState;
+import Model.Enums.ServerOptions;
+import Model.Enums.TileType;
 import java.util.EnumMap;
 import java.util.Map;
 
