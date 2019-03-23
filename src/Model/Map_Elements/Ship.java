@@ -95,6 +95,11 @@ public abstract class Ship {
         this.direction.turnRight();
     }
     
+    public void floatBy(int x, int y){
+        this.posX += x;
+        this.posY += y;
+    }
+    
     public void resetMovementSlots(){
         for(MovementType movement : movementSlots){
             movement = MovementType.NONE;

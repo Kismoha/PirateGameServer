@@ -82,6 +82,10 @@ public class Game {
             checkMovementContact(MovementType.valueOf(actions2[0]),
                     route2, route1, 2, playerTwo, set2, contact2);
         }
+
+        processCurrent(playerOne, set1);
+        processCurrent(playerTwo, set2);
+
         //Action feldolgozások
         simulateActions(ActionType.valueOf(actions1[1]),
                 ActionType.valueOf(actions1[2]), playerOne, playerTwo, set1);
@@ -135,14 +139,46 @@ public class Game {
                 && route2[counter][1] == route1[counter - 1][1];
     }
 
+    private void processCurrent(Player player, StringBuilder set) {
+        TileType tile = map[player.getShip().getPosX()][player.getShip().getPosY()];
+        switch (tile) {
+            case CURRENT_NORTH:
+                player.getShip().floatBy(0, 1);
+                appendCurrent(player,tile.toString(),set);
+                break;
+            case CURRENT_EAST:
+                player.getShip().floatBy(1, 0);
+                appendCurrent(player,tile.toString(),set);
+                break;
+            case CURRENT_SOUTH:
+                player.getShip().floatBy(0, -1);
+                appendCurrent(player,tile.toString(),set);
+                break;
+            case CURRENT_WEST:
+                player.getShip().floatBy(-1, 0);
+                appendCurrent(player,tile.toString(),set);
+                break;
+            default:
+                appendCurrent(player,"NONE",set);
+                break;
+        }
+        set.append(";");
+    }
+
+    private void appendCurrent(Player player, String type, StringBuilder set) {
+        set.append("=").append(type).append(",").
+                append(player.getShip().getPosX()).append(",").
+                append(player.getShip().getPosY());
+    }
+
     private void processMove(MovementType type, StringBuilder set, Player player) {
         player.getShip().move(type);
         set.append(type).
                 append(",").
                 append(player.getShip().getPosX()).
                 append(",").
-                append(player.getShip().getPosY()).
-                append(";");
+                append(player.getShip().getPosY());
+        //.append(";");
     }
 
     private void simulateActions(ActionType leftAction, ActionType rightAction,
