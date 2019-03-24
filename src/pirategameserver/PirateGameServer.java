@@ -42,7 +42,7 @@ public class PirateGameServer {
         //Sends out gameState
         System.out.println("Sending Game State");
         String minGame = game.genMinGame();
-        messageSenderHelper(MessageType.FIRST_GAMESTATE, minGame, minGame);
+        messageSenderHelper(MessageType.FIRST_GAMESTATE, minGame+"/1", minGame+"/2");
         //Waits for clients to be ready
         System.out.println("Waiting fo Ready");
         waitForClientReady();
