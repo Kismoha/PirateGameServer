@@ -7,7 +7,6 @@ package Model;
 
 import Model.Enums.MovementType;
 import Model.Map_Elements.Ship;
-import Model.Enums.ActionType;
 import Model.Enums.GameState;
 import Model.Enums.ServerOptions;
 import Model.Enums.TileType;
@@ -87,10 +86,13 @@ public class Game {
         processCurrent(playerTwo, set2);
 
         //Action feldolgozások
-        simulateActions(ActionType.valueOf(actions1[1]),
-                ActionType.valueOf(actions1[2]), playerOne, playerTwo, set1);
-        simulateActions(ActionType.valueOf(actions2[1]),
-                ActionType.valueOf(actions2[2]), playerTwo, playerOne, set2);
+        simulateActions(actions1[1], actions1[2], playerOne, playerTwo, set1);
+        simulateActions(actions2[1], actions2[2], playerTwo, playerOne, set2);
+        //removing last char 
+        set1.deleteCharAt(set1.length() - 1);
+        set1.append("-");
+        set2.deleteCharAt(set2.length() - 1);
+        set2.append("-");
     }
 
     private boolean checkMovementContact(MovementType move, int[][] route1, int[][] route2,
@@ -144,22 +146,22 @@ public class Game {
         switch (tile) {
             case CURRENT_NORTH:
                 player.getShip().floatBy(0, 1);
-                appendCurrent(player,tile.toString(),set);
+                appendCurrent(player, tile.toString(), set);
                 break;
             case CURRENT_EAST:
                 player.getShip().floatBy(1, 0);
-                appendCurrent(player,tile.toString(),set);
+                appendCurrent(player, tile.toString(), set);
                 break;
             case CURRENT_SOUTH:
                 player.getShip().floatBy(0, -1);
-                appendCurrent(player,tile.toString(),set);
+                appendCurrent(player, tile.toString(), set);
                 break;
             case CURRENT_WEST:
                 player.getShip().floatBy(-1, 0);
-                appendCurrent(player,tile.toString(),set);
+                appendCurrent(player, tile.toString(), set);
                 break;
             default:
-                appendCurrent(player,"NONE",set);
+                appendCurrent(player, "NONE", set);
                 break;
         }
         set.append(";");
@@ -181,71 +183,69 @@ public class Game {
         //.append(";");
     }
 
-    private void simulateActions(ActionType leftAction, ActionType rightAction,
+    private void simulateActions(String leftAction, String rightAction,
             Player player, Player otherPlayer, StringBuilder set) {
         Direction dir = player.getShip().getDirection();
         dir.turnLeft();
-        checkActionContact(leftAction, player, otherPlayer, dir, set, true);
+        checkActionContact(leftAction, player, otherPlayer, dir, set);
         dir = player.getShip().getDirection();
         dir.turnRight();
-        checkActionContact(rightAction, player, otherPlayer, dir, set, false);
+        checkActionContact(rightAction, player, otherPlayer, dir, set);
     }
 
-    private void checkActionContact(ActionType type, Player player,
-            Player otherPlayer, Direction dir, StringBuilder set, boolean isLeft) {
+    private void checkActionContact(String type, Player player,
+            Player otherPlayer, Direction dir, StringBuilder set) {
         int x = player.getShip().getPosX();
         int y = player.getShip().getPosY();
-        boolean outOfBounds = false;
+        boolean shot = false;
         switch (type) {
-            case NONE:
-                set.append(ActionType.NONE.toString()).append(";");
+            case "NONE":
+                set.append(type).append(";");
                 break;
-            case SHOOT:
+            case "SHOOT":
+                for (int i = 0; i < 3; i++) {
+                    x += dir.getX();
+                    y += dir.getY();
+                    if (x < 0 || x >= MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
+                        set.append("SHOOTMISS").append(",")
+                                .append(x - dir.getX()).append(",").append(y - dir.getY()).append(";");
+                        shot = true;
+                        break;
+                    } else if (map[x][y] == TileType.ROCK) {
+                        set.append("SHOOTHIT").append(",")
+                                .append(x).append(",").append(y).append(";");
+                        shot = true;
+                        break;
+                    } else if (x == otherPlayer.getShip().getPosX()
+                            && y == otherPlayer.getShip().getPosY()) {
+                        set.append("SHOOTHIT").append(",")
+                                .append(x).append(",").append(y).append(";");
+                        otherPlayer.getShip().sufferDamage(1);
+                        shot = true;
+                        break;
+                    }
+                }
+                if (!shot) {
+                    set.append("SHOOTMISS").append(",")
+                            .append(x).append(",").append(y).append(";");
+                }
+                break;
+            case "GRAPPLE":
                 x += dir.getX();
                 y += dir.getY();
                 if (x < 0 || x >= MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
-                    outOfBounds = true;
-                }
-                if (!outOfBounds && map[x][y] == TileType.ROCK) {
-                    set.append(isLeft ? ActionType.SHOOT_HIT_LEFT_1
-                            : ActionType.SHOOT_HIT_RIGHT_1).append(";");
-                }
-                if (!outOfBounds && x == otherPlayer.getShip().getPosX()
-                        && y == otherPlayer.getShip().getPosY()) {
-                    set.append(isLeft ? ActionType.SHOOT_HIT_LEFT_1
-                            : ActionType.SHOOT_HIT_RIGHT_1).append(";");
-                    otherPlayer.getShip().sufferDamage(1);
-                }
-                x += dir.getX();
-                y += dir.getY();
-                if (x < 0 || x >= MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
-                    outOfBounds = true;
-                }
-                if (!outOfBounds && map[x][y] == TileType.ROCK) {
-                    set.append(isLeft ? ActionType.SHOOT_HIT_LEFT_2
-                            : ActionType.SHOOT_HIT_RIGHT_2).append(";");
-                } else if (!outOfBounds && x == otherPlayer.getShip().getPosX()
-                        && y == otherPlayer.getShip().getPosY()) {
-                    set.append(isLeft ? ActionType.SHOOT_HIT_LEFT_2
-                            : ActionType.SHOOT_HIT_RIGHT_2).append(";");
-                    otherPlayer.getShip().sufferDamage(1);
+                    set.append("NONE").append(",")
+                            .append(x - dir.getX()).append(",").append(y - dir.getY()).append(";");
+                    break;
+                } else {
+                    set.append(type).append(",")
+                            .append(x).append(",").append(y).append(";");
+                    if (x == otherPlayer.getShip().getPosX()
+                            && y == otherPlayer.getShip().getPosY()) {
+                        winner = player;
+                    }
                 }
                 break;
-            case GRAPPLE:
-                x += dir.getX();
-                y += dir.getY();
-                set.append(isLeft ? ActionType.GRAPPLE_LEFT
-                        : ActionType.GRAPPLE_RIGHT).append(";");
-                if (x == otherPlayer.getShip().getPosX()
-                        && y == otherPlayer.getShip().getPosY()) {
-                    winner = player;
-                }
-                break;
-        }
-        if (!isLeft) {
-            set.deleteCharAt(set.length() - 1);
-            set.append("-");
-
         }
     }
 
