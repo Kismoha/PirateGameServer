@@ -208,7 +208,8 @@ public class Game {
                     y += dir.getY();
                     if (x < 0 || x >= MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
                         set.append("SHOOTMISS").append(",")
-                                .append(x - dir.getX()).append(",").append(y - dir.getY()).append(";");
+                                .append(x - dir.getX()).append(",").
+                                append(y - dir.getY()).append(";");
                         shot = true;
                         break;
                     } else if (map[x][y] == TileType.ROCK) {
