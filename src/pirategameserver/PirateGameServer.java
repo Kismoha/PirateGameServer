@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -42,7 +44,7 @@ public class PirateGameServer {
         //Sends out gameState
         System.out.println("Sending Game State");
         String minGame = game.genMinGame();
-        messageSenderHelper(MessageType.FIRST_GAMESTATE, minGame+"/1", minGame+"/2");
+        messageSenderHelper(MessageType.FIRST_GAMESTATE, minGame + "/1", minGame + "/2");
         //Waits for clients to be ready
         System.out.println("Waiting fo Ready");
         waitForClientReady();
@@ -72,7 +74,7 @@ public class PirateGameServer {
             String message = game.getPlayerOne().getMoveSet()
                     + "/"
                     + game.getPlayerTwo().getMoveSet();
-            messageSenderHelper(MessageType.GAMESTATE,message,message);
+            messageSenderHelper(MessageType.GAMESTATE, message, message);
         }
     }
 
@@ -153,28 +155,24 @@ public class PirateGameServer {
             message = player.getIn().readLine();
             System.out.println("Message recieved");
         } catch (IOException e) {
-            System.out.println("Failed to read options from: " + player.getSocket().toString());
-            e.printStackTrace();
+            errorMessage(player);
         }
         return message;
     }
 
     private void writeToClients(String message1, String message2) {
+        writeToClient(message1, game.getPlayerOne());
+        writeToClient(message2, game.getPlayerTwo());
+    }
+
+    private void writeToClient(String message, Player player) {
         try {
-            PrintWriter out = game.getPlayerOne().getOut();
-            System.out.println("Sending message: " + message1);
-            out.println(message1);
+            PrintWriter out = player.getOut();
+            System.out.println("Sending message: " + message);
+            out.println(message);
             out.flush();
         } catch (Exception e) {
-
-        }
-        try {
-            PrintWriter out = game.getPlayerTwo().getOut();
-            System.out.println("Sending message: " + message2);
-            out.println(message2);
-            out.flush();
-        } catch (Exception e) {
-
+            errorMessage(player);
         }
     }
 
@@ -182,6 +180,19 @@ public class PirateGameServer {
         String messageStart = type.toString() + ":";
         writeToClients(messageStart + message1, messageStart + message2);
 
+    }
+
+    private void errorMessage(Player player) {
+        if (player == game.getPlayerOne()) {
+            writeToClient("ERROR:ERROR", game.getPlayerTwo());
+        } else {
+            writeToClient("ERROR:ERROR", game.getPlayerOne());
+        }
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PirateGameServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
