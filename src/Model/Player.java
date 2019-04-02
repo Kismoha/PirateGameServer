@@ -23,6 +23,7 @@ public class Player {
     private Sloop ship;
     private Socket socket;
     private boolean ready;
+    private boolean won;
     
     private BufferedReader in;
     private PrintWriter out;
@@ -34,6 +35,7 @@ public class Player {
         this.socket = socket;
         ship = new Sloop();
         ready = false;
+        won = false;
         try{
             in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             out = new PrintWriter(this.socket.getOutputStream());
@@ -104,6 +106,14 @@ public class Player {
 
     public void setMoveSet(String moveSet) {
         this.moveSet = moveSet;
+    }
+
+    public boolean hasWon() {
+        return won;
+    }
+
+    public void setWon(boolean won) {
+        this.won = won;
     }
     
     

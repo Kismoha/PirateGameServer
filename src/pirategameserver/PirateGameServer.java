@@ -71,10 +71,14 @@ public class PirateGameServer {
         while (true) {
             readFromClients();
             game.simulateTurn();
-            String message = game.getPlayerOne().getMoveSet()
+            String mainMessage = game.getPlayerOne().getMoveSet()
                     + "/"
                     + game.getPlayerTwo().getMoveSet();
-            messageSenderHelper(MessageType.GAMESTATE, message, message);
+            messageSenderHelper(MessageType.GAMESTATE,
+                    genGameStateMessage(mainMessage, game.getPlayerOne(),
+                            game.getPlayerTwo()),
+                    genGameStateMessage(mainMessage, game.getPlayerTwo(),
+                            game.getPlayerOne()));
         }
     }
 
@@ -106,6 +110,17 @@ public class PirateGameServer {
         readFromClients();
     }
 
+    private String genGameStateMessage(String start, Player player,
+            Player otherPlayer) {
+        StringBuilder str = new StringBuilder("");
+        str.append(start).append(":")
+                .append(player.getShip().shipStateMessage())
+                .append(":")
+                .append(game.isIsGameEnded()
+                        ? game.genEndMessage(player, otherPlayer) : "NOPE");
+        return str.toString();
+    }
+
     private void readFromClients() {
         String message;
         message = readMessageFrom(game.getPlayerOne());
@@ -123,22 +138,19 @@ public class PirateGameServer {
         switch (messageType) {
             case OPTION:
                 if (game.getState() != GameState.INICIALIZATION) {
-                    System.out.println("State mishap");
-                    System.exit(0);
+                    stateMishap();
                 }
                 game.updateOptions(messageContent);
                 break;
             case READY:
                 if (game.getState() != GameState.READY) {
-                    System.out.println("State mishap");
-                    System.exit(0);
+                    stateMishap();
                 }
                 player.setReady(true);
                 break;
             case GAMESTATE:
                 if (game.getState() != GameState.GAME) {
-                    System.out.println("State mishap");
-                    System.exit(0);
+                    stateMishap();
                 }
                 player.setNewState(messageContent);
                 break;
@@ -156,6 +168,7 @@ public class PirateGameServer {
             System.out.println("Message recieved");
         } catch (IOException e) {
             errorMessage(player);
+            waitAndExit();
         }
         return message;
     }
@@ -176,6 +189,13 @@ public class PirateGameServer {
         }
     }
 
+    private void stateMishap() {
+        errorMessage(game.getPlayerOne());
+        errorMessage(game.getPlayerTwo());
+        System.out.println("State mishap");
+        waitAndExit();
+    }
+
     private void messageSenderHelper(MessageType type, String message1, String message2) {
         String messageStart = type.toString() + ":";
         writeToClients(messageStart + message1, messageStart + message2);
@@ -193,6 +213,23 @@ public class PirateGameServer {
         } catch (InterruptedException ex) {
             Logger.getLogger(PirateGameServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void waitAndExit() {
+        Thread wait = new Thread(() -> {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PirateGameServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+        wait.start();
+        try {
+            wait.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PirateGameServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.exit(0);
     }
 
     /**

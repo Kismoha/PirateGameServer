@@ -9,7 +9,6 @@ import Model.Direction;
 import Model.Enums.ShipType;
 import Model.Enums.MovementType;
 import java.util.EnumMap;
-import java.util.Map;
 
 /**
  *
@@ -115,7 +114,19 @@ public abstract class Ship {
             this.movementAmmount.put(mt,this.initialMovementAmmount);
         }
     }
+    
+    public boolean isWrecked(){
+        return currentDamage >= damageThreshold;
+    }
 
+    public String shipStateMessage(){
+        StringBuilder str = new StringBuilder("");
+        str.append(":").append(currentDamage).append(",")
+                .append(currentLoadedGuns).append(",")
+                .append(grapples);
+        return str.toString();
+    }
+    
     public ShipType getType() {
         return type;
     }

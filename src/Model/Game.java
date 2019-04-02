@@ -29,9 +29,8 @@ public class Game {
 
     private Map<ServerOptions, Boolean> options;
 
-    private Player winner;
-
     private GameState state;
+    private boolean isGameEnded;
 
     public Game() {
         map = new TileType[MAP_WIDTH][MAP_HEIGHT];
@@ -39,10 +38,10 @@ public class Game {
         options.put(ServerOptions.FOG, Boolean.TRUE);
         options.put(ServerOptions.MANEUVER, Boolean.TRUE);
         options.put(ServerOptions.PICK_UP, Boolean.TRUE);
-        winner = null;
         playerOne = null;
         playerTwo = null;
         state = GameState.INICIALIZATION;
+        isGameEnded = false;
     }
 
     //Leszimulál egy kört
@@ -88,6 +87,8 @@ public class Game {
         //Action feldolgozások
         simulateActions(actions1[1], actions1[2], playerOne, playerTwo, set1);
         simulateActions(actions2[1], actions2[2], playerTwo, playerOne, set2);
+
+        isGameEnded = checkWinner();
         //removing last char 
         set1.deleteCharAt(set1.length() - 1);
         set1.append("-");
@@ -221,7 +222,13 @@ public class Game {
                             && y == otherPlayer.getShip().getPosY()) {
                         set.append("SHOOTHIT").append(",")
                                 .append(x).append(",").append(y).append(";");
-                        otherPlayer.getShip().sufferDamage(1);
+                        if (!isGameEnded) {
+                            otherPlayer.getShip().sufferDamage(1);
+                            if (otherPlayer.getShip().isWrecked()) {
+                                playerOne.setWon(true);
+                            }
+                        }
+
                         shot = true;
                         break;
                     }
@@ -243,7 +250,9 @@ public class Game {
                             .append(x).append(",").append(y).append(";");
                     if (x == otherPlayer.getShip().getPosX()
                             && y == otherPlayer.getShip().getPosY()) {
-                        winner = player;
+                        if (!isGameEnded) {
+                            player.setWon(true);
+                        }
                     }
                 }
                 break;
@@ -287,6 +296,40 @@ public class Game {
                 break;
         }
         return route;
+    }
+
+    private boolean checkWinner() {
+        return playerOne.hasWon() || playerTwo.hasWon();
+    }
+
+    public String genEndMessage(Player player, Player otherPlayer) {
+        StringBuilder str = new StringBuilder("");
+        str.append(":").append(player.hasWon()).append(",");
+        StringBuilder cause = new StringBuilder("");
+        if(player.hasWon() && otherPlayer.hasWon()){
+            cause.append("Döntetlen! ");
+            if(player.getShip().isWrecked() && otherPlayer.getShip().isWrecked()){
+                cause.append("Egyszerre vittétek be az utolsó lövést!");
+            }else{
+                cause.append("Egyszerre csáklyáztátok meg egymást!");
+            }
+        }else if(player.hasWon()){
+            cause.append("Nyertél! ");
+            if(otherPlayer.getShip().isWrecked()){
+                cause.append("Sikerült elsüllyesztened az ellenfeled hajóját");
+            }else{
+                cause.append("Sikerült megcsákyláznod az ellenfeled hajóját");
+            }
+        }else{
+           cause.append("Vesztettél! ");
+            if(player.getShip().isWrecked()){
+                cause.append("Az ellenfeled elsüllyesztette a hajód!");
+            }else{
+                cause.append("Az ellenfeled megcsáklyázta a hajód!");
+            } 
+        }
+        str.append(cause);
+        return str.toString();
     }
 
     //Egy beérkezett üzenet alapján frissíti a játék beállításokat
@@ -335,7 +378,7 @@ public class Game {
                 if (i == MAP_HEIGHT - 1 && j == MAP_WIDTH - 1) {
                     mapString.append(map[i][j].toString());
                 } else {
-                    mapString.append(map[i][j].toString() + ";");
+                    mapString.append(map[i][j].toString()).append(";");
                 }
 
             }
@@ -365,14 +408,6 @@ public class Game {
         this.options = options;
     }
 
-    public Player getWinner() {
-        return winner;
-    }
-
-    public void setWinner(Player winner) {
-        this.winner = winner;
-    }
-
     public Player getPlayerOne() {
         return playerOne;
     }
@@ -395,6 +430,10 @@ public class Game {
 
     public void setState(GameState state) {
         this.state = state;
+    }
+
+    public boolean isIsGameEnded() {
+        return isGameEnded;
     }
 
 }
