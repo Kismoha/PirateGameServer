@@ -57,6 +57,9 @@ public class Game {
 
         playerOne.setMoveSet(set1.deleteCharAt(set1.length() - 1).toString());
         playerTwo.setMoveSet(set2.deleteCharAt(set2.length() - 1).toString());
+        
+        playerOne.getShip().shotGain(2);
+        playerTwo.getShip().shotGain(2);
     }
 
     //leszimulál egy lépést
@@ -204,57 +207,66 @@ public class Game {
                 set.append(type).append(";");
                 break;
             case "SHOOT":
-                for (int i = 0; i < 3; i++) {
+                if (player.getShip().getCurrentLoadedGuns() != 0) {
+                    for (int i = 0; i < 3; i++) {
+                        x += dir.getX();
+                        y += dir.getY();
+                        if (x < 0 || x >= MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
+                            set.append("SHOOTMISS").append(",")
+                                    .append(x - dir.getX()).append(",").
+                                    append(y - dir.getY()).append(";");
+                            shot = true;
+                            break;
+                        } else if (map[x][y] == TileType.ROCK) {
+                            set.append("SHOOTHIT").append(",")
+                                    .append(x).append(",").append(y).append(";");
+                            shot = true;
+                            break;
+                        } else if (x == otherPlayer.getShip().getPosX()
+                                && y == otherPlayer.getShip().getPosY()) {
+                            set.append("SHOOTHIT").append(",")
+                                    .append(x).append(",").append(y).append(";");
+                            if (!isGameEnded) {
+                                otherPlayer.getShip().sufferDamage(1);
+                                if (otherPlayer.getShip().isWrecked()) {
+                                    playerOne.setWon(true);
+                                }
+                            }
+                            shot = true;
+                            break;
+                        }
+                    }
+                    if (!shot) {
+                        set.append("SHOOTMISS").append(",")
+                                .append(x).append(",").append(y).append(";");
+                    }
+                }else{
+                    set.append("NONE").append(";");
+                }
+                player.getShip().shot();
+                break;
+            case "GRAPPLE":
+                if (player.getShip().getGrapples() != 0) {
                     x += dir.getX();
                     y += dir.getY();
                     if (x < 0 || x >= MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
-                        set.append("SHOOTMISS").append(",")
-                                .append(x - dir.getX()).append(",").
-                                append(y - dir.getY()).append(";");
-                        shot = true;
+                        set.append("NONE").append(",")
+                                .append(x - dir.getX()).append(",").append(y - dir.getY()).append(";");
                         break;
-                    } else if (map[x][y] == TileType.ROCK) {
-                        set.append("SHOOTHIT").append(",")
+                    } else {
+                        set.append(type).append(",")
                                 .append(x).append(",").append(y).append(";");
-                        shot = true;
-                        break;
-                    } else if (x == otherPlayer.getShip().getPosX()
-                            && y == otherPlayer.getShip().getPosY()) {
-                        set.append("SHOOTHIT").append(",")
-                                .append(x).append(",").append(y).append(";");
-                        if (!isGameEnded) {
-                            otherPlayer.getShip().sufferDamage(1);
-                            if (otherPlayer.getShip().isWrecked()) {
-                                playerOne.setWon(true);
+                        if (x == otherPlayer.getShip().getPosX()
+                                && y == otherPlayer.getShip().getPosY()) {
+                            if (!isGameEnded) {
+                                player.setWon(true);
                             }
                         }
-
-                        shot = true;
-                        break;
                     }
+                }else{
+                    set.append("NONE").append(";");
                 }
-                if (!shot) {
-                    set.append("SHOOTMISS").append(",")
-                            .append(x).append(",").append(y).append(";");
-                }
-                break;
-            case "GRAPPLE":
-                x += dir.getX();
-                y += dir.getY();
-                if (x < 0 || x >= MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
-                    set.append("NONE").append(",")
-                            .append(x - dir.getX()).append(",").append(y - dir.getY()).append(";");
-                    break;
-                } else {
-                    set.append(type).append(",")
-                            .append(x).append(",").append(y).append(";");
-                    if (x == otherPlayer.getShip().getPosX()
-                            && y == otherPlayer.getShip().getPosY()) {
-                        if (!isGameEnded) {
-                            player.setWon(true);
-                        }
-                    }
-                }
+                player.getShip().grapple();
                 break;
         }
     }
@@ -306,27 +318,27 @@ public class Game {
         StringBuilder str = new StringBuilder("");
         str.append(":").append(player.hasWon()).append(",");
         StringBuilder cause = new StringBuilder("");
-        if(player.hasWon() && otherPlayer.hasWon()){
+        if (player.hasWon() && otherPlayer.hasWon()) {
             cause.append("Döntetlen! ");
-            if(player.getShip().isWrecked() && otherPlayer.getShip().isWrecked()){
+            if (player.getShip().isWrecked() && otherPlayer.getShip().isWrecked()) {
                 cause.append("Egyszerre vittétek be az utolsó lövést!");
-            }else{
+            } else {
                 cause.append("Egyszerre csáklyáztátok meg egymást!");
             }
-        }else if(player.hasWon()){
+        } else if (player.hasWon()) {
             cause.append("Nyertél! ");
-            if(otherPlayer.getShip().isWrecked()){
+            if (otherPlayer.getShip().isWrecked()) {
                 cause.append("Sikerült elsüllyesztened az ellenfeled hajóját");
-            }else{
+            } else {
                 cause.append("Sikerült megcsákyláznod az ellenfeled hajóját");
             }
-        }else{
-           cause.append("Vesztettél! ");
-            if(player.getShip().isWrecked()){
+        } else {
+            cause.append("Vesztettél! ");
+            if (player.getShip().isWrecked()) {
                 cause.append("Az ellenfeled elsüllyesztette a hajód!");
-            }else{
+            } else {
                 cause.append("Az ellenfeled megcsáklyázta a hajód!");
-            } 
+            }
         }
         str.append(cause);
         return str.toString();

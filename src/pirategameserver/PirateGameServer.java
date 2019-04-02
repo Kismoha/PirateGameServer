@@ -88,7 +88,7 @@ public class PirateGameServer {
             Socket connection = server.accept();
             System.out.println("Connection");
             game.setPlayerOne(new Player(connection));
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -99,7 +99,7 @@ public class PirateGameServer {
             game.setPlayerTwo(new Player(connection));
             game.getPlayerTwo().getShip().setPosX(2);
             game.getPlayerTwo().getShip().setPosY(2);
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

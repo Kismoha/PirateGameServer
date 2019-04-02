@@ -121,10 +121,27 @@ public abstract class Ship {
 
     public String shipStateMessage(){
         StringBuilder str = new StringBuilder("");
-        str.append(":").append(currentDamage).append(",")
+        str.append(currentDamage).append(",")
                 .append(currentLoadedGuns).append(",")
                 .append(grapples);
         return str.toString();
+    }
+    
+    public void shot() {
+        currentLoadedGuns--;
+    }
+
+    public void shotGain(int ammount) {
+        int wannaBe = currentLoadedGuns += ammount;
+        currentLoadedGuns = wannaBe <= maxLoadedGuns ? wannaBe : maxLoadedGuns;
+    }
+
+    public void grapple() {
+        grapples--;
+    }
+
+    public void grappleGain(int ammount) {
+        grapples += ammount;
     }
     
     public ShipType getType() {

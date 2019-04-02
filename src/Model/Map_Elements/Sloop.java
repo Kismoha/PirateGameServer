@@ -23,8 +23,8 @@ public class Sloop extends Ship{
         this.currentDamage = 0;
         
         this.shotPerAction = 1;
-        this.maxLoadedGuns = 6;
-        this.currentLoadedGuns = 4;
+        this.maxLoadedGuns = 8;
+        this.currentLoadedGuns = 6;
         this.grapples = 4;
         
         this.speed = 3;

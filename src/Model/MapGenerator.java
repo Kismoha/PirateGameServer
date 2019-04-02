@@ -28,9 +28,9 @@ public class MapGenerator {
     private final int currentLengthMin = 3;
     private final int currentLengthMax = Math.max(MAP_WIDTH, MAP_HEIGHT);
 
-    private int[][] rockStartNodes;
-    private Current[] currents;
-    private TileType[][] map;
+    private final int[][] rockStartNodes;
+    private final Current[] currents;
+    private final TileType[][] map;
 
     public MapGenerator() {
         rockChanceThreshold
@@ -169,7 +169,6 @@ public class MapGenerator {
             case 3:
                 return new Direction("WEST");
             default:
-                System.out.println("random dir default");
                 return null;
         }
     }
