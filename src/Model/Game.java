@@ -57,7 +57,7 @@ public class Game {
 
         playerOne.setMoveSet(set1.deleteCharAt(set1.length() - 1).toString());
         playerTwo.setMoveSet(set2.deleteCharAt(set2.length() - 1).toString());
-        
+
         playerOne.getShip().shotGain(2);
         playerTwo.getShip().shotGain(2);
     }
@@ -84,8 +84,8 @@ public class Game {
                     route2, route1, 2, playerTwo, set2, contact2);
         }
 
-        processCurrent(playerOne, set1);
-        processCurrent(playerTwo, set2);
+        processCurrent(playerOne, playerTwo, set1);
+        processCurrent(playerTwo, playerOne, set2);
 
         //Action feldolgozások
         simulateActions(actions1[1], actions1[2], playerOne, playerTwo, set1);
@@ -145,30 +145,44 @@ public class Game {
                 && route2[counter][1] == route1[counter - 1][1];
     }
 
-    private void processCurrent(Player player, StringBuilder set) {
-        TileType tile = map[player.getShip().getPosX()][player.getShip().getPosY()];
+    private void processCurrent(Player player, Player otherPlayer, StringBuilder set) {
+        int x = player.getShip().getPosX();
+        int y = player.getShip().getPosY();
+        int otherX = otherPlayer.getShip().getPosX();
+        int otherY = otherPlayer.getShip().getPosY();
+        TileType tile = map[x][y];
         switch (tile) {
             case CURRENT_NORTH:
-                player.getShip().floatBy(0, 1);
-                appendCurrent(player, tile.toString(), set);
+                manageCurrentTile(player, tile, 0, 1, otherX, otherY, set);
                 break;
             case CURRENT_EAST:
-                player.getShip().floatBy(1, 0);
-                appendCurrent(player, tile.toString(), set);
+                manageCurrentTile(player, tile, 1, 0, otherX, otherY, set);
                 break;
             case CURRENT_SOUTH:
-                player.getShip().floatBy(0, -1);
-                appendCurrent(player, tile.toString(), set);
+                manageCurrentTile(player, tile, 0, -1, otherX, otherY, set);
                 break;
             case CURRENT_WEST:
-                player.getShip().floatBy(-1, 0);
-                appendCurrent(player, tile.toString(), set);
+                manageCurrentTile(player, tile, -1, 0, otherX, otherY, set);
                 break;
             default:
                 appendCurrent(player, "NONE", set);
                 break;
         }
         set.append(";");
+    }
+
+    private void manageCurrentTile(Player player, TileType tile,
+            int byX, int byY, int otherX, int otherY, StringBuilder set) {
+        int toX = player.getShip().getPosX() + byX;
+        int toY = player.getShip().getPosY() + byY;
+        if (toX >= 0 && toX < MAP_WIDTH && toY >= 0 && toY < MAP_HEIGHT
+                && map[toX][toY] != TileType.ROCK
+                && toX != otherX && toY != otherY) {
+            player.getShip().floatBy(byX, byY);
+            appendCurrent(player, tile.toString(), set);
+        } else {
+            appendCurrent(player, "NONE", set);
+        }
     }
 
     private void appendCurrent(Player player, String type, StringBuilder set) {
@@ -240,7 +254,7 @@ public class Game {
                         set.append("SHOOTMISS").append(",")
                                 .append(x).append(",").append(y).append(";");
                     }
-                }else{
+                } else {
                     set.append("NONE").append(";");
                 }
                 player.getShip().shot();
@@ -263,7 +277,7 @@ public class Game {
                             }
                         }
                     }
-                }else{
+                } else {
                     set.append("NONE").append(";");
                 }
                 player.getShip().grapple();
@@ -374,13 +388,6 @@ public class Game {
 
     private Direction genStartingDir() {
         return new Direction("SOUTH");
-    }
-
-    private int[] genStartingPos(int i) {
-        int[] temp = new int[2];
-        temp[0] = i;
-        temp[1] = i;
-        return temp;
     }
 
     public String genMinGame() {
