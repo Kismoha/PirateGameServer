@@ -10,5 +10,5 @@ package Model.Enums;
  * @author kismo
  */
 public enum MessageType {
-    FIRST_GAMESTATE,GAMESTATE,OPTION,READY,STARTGAME,NONE
+    FIRST_GAMESTATE,GAMESTATE,SIGN,READY,STARTGAME,NONE
 }

@@ -8,9 +8,7 @@ package Model;
 import Model.Enums.MovementType;
 import Model.Map_Elements.Ship;
 import Model.Enums.GameState;
-import Model.Enums.ServerOptions;
 import Model.Enums.TileType;
-import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -27,17 +25,11 @@ public class Game {
     Player playerOne;
     Player playerTwo;
 
-    private Map<ServerOptions, Boolean> options;
-
     private GameState state;
     private boolean isGameEnded;
 
     public Game() {
         map = new TileType[MAP_WIDTH][MAP_HEIGHT];
-        options = new EnumMap(ServerOptions.class);
-        options.put(ServerOptions.FOG, Boolean.TRUE);
-        options.put(ServerOptions.MANEUVER, Boolean.TRUE);
-        options.put(ServerOptions.PICK_UP, Boolean.TRUE);
         playerOne = null;
         playerTwo = null;
         state = GameState.INICIALIZATION;
@@ -358,19 +350,6 @@ public class Game {
         return str.toString();
     }
 
-    //Egy beérkezett üzenet alapján frissíti a játék beállításokat
-    public void updateOptions(String options) {
-        String[] values = options.split(";");
-        if (values[0].equalsIgnoreCase("0")) {
-            this.options.put(ServerOptions.FOG, Boolean.FALSE);
-        }
-        if (values[1].equalsIgnoreCase("0")) {
-            this.options.put(ServerOptions.MANEUVER, Boolean.FALSE);
-        }
-        if (values[2].equalsIgnoreCase("0")) {
-            this.options.put(ServerOptions.PICK_UP, Boolean.FALSE);
-        }
-    }
 
     public void generateMap() {
         MapGenerator mapGen = new MapGenerator();
@@ -417,14 +396,6 @@ public class Game {
 
     public void setMap(TileType[][] map) {
         this.map = map;
-    }
-
-    public Map<ServerOptions, Boolean> getOptions() {
-        return options;
-    }
-
-    public void setOptions(Map<ServerOptions, Boolean> options) {
-        this.options = options;
     }
 
     public Player getPlayerOne() {

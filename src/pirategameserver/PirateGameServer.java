@@ -37,8 +37,8 @@ public class PirateGameServer {
         waitForConnections();
         //Generates Map
         game.generateMap();
-        //Waits for game opions from clients
-        System.out.println("Waiting fo Options");
+        //Waits for first sign from client
+        System.out.println("Waiting for first sign from client");
         readFromClients();
         game.setState(GameState.READY);
         //Sends out gameState
@@ -136,11 +136,10 @@ public class PirateGameServer {
         messageType = MessageType.valueOf(splitMessage[0]);
         messageContent = splitMessage[1];
         switch (messageType) {
-            case OPTION:
+            case SIGN:
                 if (game.getState() != GameState.INICIALIZATION) {
                     stateMishap();
                 }
-                game.updateOptions(messageContent);
                 break;
             case READY:
                 if (game.getState() != GameState.READY) {
