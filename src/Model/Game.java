@@ -9,7 +9,6 @@ import Model.Enums.MovementType;
 import Model.Map_Elements.Ship;
 import Model.Enums.GameState;
 import Model.Enums.TileType;
-import java.util.Map;
 
 /**
  *
@@ -17,10 +16,10 @@ import java.util.Map;
  */
 public class Game {
 
-    public static final int MAP_HEIGHT = 50;
-    public static final int MAP_WIDTH = 50;
+    public static final int MAP_HEIGHT = 22;
+    public static final int MAP_WIDTH = 46;
 
-    private TileType[][] map = new TileType[MAP_HEIGHT][MAP_WIDTH];
+    private TileType[][] map = new TileType[MAP_WIDTH][MAP_HEIGHT];
 
     Player playerOne;
     Player playerTwo;
@@ -355,25 +354,21 @@ public class Game {
         MapGenerator mapGen = new MapGenerator();
         mapGen.genMap();
         map = mapGen.getMap();
-        playerOne.getShip().setDirection(genStartingDir());
-        playerTwo.getShip().setDirection(genStartingDir());
+        playerOne.getShip().setDirection(mapGen.randomDir());
+        playerTwo.getShip().setDirection(mapGen.randomDir());
 
-        playerOne.getShip().setPosX(2);
-        playerOne.getShip().setPosY(2);
-        playerTwo.getShip().setPosX(4);
-        playerTwo.getShip().setPosY(4);
+        playerOne.getShip().setPosX(mapGen.getPosXOne());
+        playerOne.getShip().setPosY(mapGen.getPosYOne());
+        playerTwo.getShip().setPosX(mapGen.getPosXTwo());
+        playerTwo.getShip().setPosY(mapGen.getPosYTwo());
 
-    }
-
-    private Direction genStartingDir() {
-        return new Direction("SOUTH");
     }
 
     public String genMinGame() {
         StringBuilder mapString = new StringBuilder("");
-        for (int i = 0; i < MAP_HEIGHT; i++) {
-            for (int j = 0; j < MAP_WIDTH; j++) {
-                if (i == MAP_HEIGHT - 1 && j == MAP_WIDTH - 1) {
+        for (int i = 0; i < MAP_WIDTH; i++) {
+            for (int j = 0; j < MAP_HEIGHT; j++) {
+                if (i == MAP_WIDTH - 1 && j == MAP_HEIGHT - 1) {
                     mapString.append(map[i][j].toString());
                 } else {
                     mapString.append(map[i][j].toString()).append(";");
@@ -381,7 +376,7 @@ public class Game {
 
             }
         }
-        return MAP_HEIGHT + ";" + MAP_WIDTH + "-" + mapString.toString() + "-"
+        return MAP_WIDTH + ";" + MAP_HEIGHT + "-" + mapString.toString() + "-"
                 + playerOne.getShip().getPosX() + ";"
                 + playerOne.getShip().getPosY() + ";"
                 + playerOne.getShip().getDirection().getDir() + ";"

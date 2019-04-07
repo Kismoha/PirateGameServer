@@ -208,7 +208,7 @@ public class PirateGameServer {
             writeToClient("ERROR:ERROR", game.getPlayerOne());
         }
         try {
-            Thread.sleep(10000);
+            Thread.sleep(5000);
         } catch (InterruptedException ex) {
             Logger.getLogger(PirateGameServer.class.getName()).log(Level.SEVERE, null, ex);
         }

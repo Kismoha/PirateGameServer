@@ -32,12 +32,20 @@ public class MapGenerator {
     private final Current[] currents;
     private final TileType[][] map;
 
+    private Direction dirOne;
+    private int posXOne;
+    private int posYOne;
+
+    private Direction dirTwo;
+    private int posXTwo;
+    private int posYTwo;
+
     public MapGenerator() {
         rockChanceThreshold
                 = (rockChanceUpperLimit - rockChanceLowerLimit) / 8;
         rockBaseChance = rockChanceUpperLimit - rockChanceThreshold;
 
-        map = new TileType[MAP_HEIGHT][MAP_WIDTH];
+        map = new TileType[MAP_WIDTH][MAP_HEIGHT];
         rockStartNodes = new int[rockCount][2];
         currents = new Current[currentCount];
     }
@@ -47,6 +55,61 @@ public class MapGenerator {
         generateRockNodes();
         generateCurrents();
         populateMap();
+        genStartingPositions();
+        genStartingDirections();
+    }
+
+    private void genStartingDirections(){
+        do{
+            dirOne = randomDir();
+            dirTwo = randomDir();
+        }while(!validDirections());
+    }
+    
+    private boolean validDirections(){
+        boolean first = map[posXOne+dirOne.getX()][posYOne+dirOne.getY()] !=
+                TileType.ROCK;
+        boolean second = map[posXTwo+dirTwo.getX()][posYTwo+dirTwo.getY()] !=
+                TileType.ROCK;
+        return first && second;
+    }
+    
+    private void genStartingPositions() {
+        do {
+            randomizeCoords(1);
+            randomizeCoords(2);
+        } while (!validShipDistance()/* && !shipsAreReachAble()*/);
+    }
+
+    private void randomizeCoords(int player) {
+        Random rnd = new Random();
+        int rndX, rndY;
+        do {
+            rndX = rnd.nextInt(MAP_WIDTH);
+            rndY = rnd.nextInt(MAP_HEIGHT);
+        } while (!validStartingPos(rndX, rndY));
+        if(player == 1){
+            posXOne = rndX;
+            posYOne = rndY;
+        }else if(player == 2){
+            posXTwo = rndX;
+            posYTwo = rndY;
+        }
+    }
+
+    private boolean validStartingPos(int x, int y) {
+        return map[x][y] == TileType.WATER;
+    }
+
+    private boolean shipsAreReachAble() {
+        return true;
+    }
+
+    private boolean validShipDistance() {
+        double a = Math.abs(posXOne - posXTwo);
+        double b = Math.abs(posYOne - posYTwo);
+        double c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+        return c < 10 && c > 3;
     }
 
     private void fillMapWithWater() {
@@ -157,7 +220,7 @@ public class MapGenerator {
                 && map[x][y] == TileType.WATER;
     }
 
-    private Direction randomDir() {
+    public Direction randomDir() {
         int random = new Random().nextInt(4);
         switch (random) {
             case 0:
@@ -176,4 +239,22 @@ public class MapGenerator {
     public TileType[][] getMap() {
         return map;
     }
+
+    public int getPosXOne() {
+        return posXOne;
+    }
+
+    public int getPosYOne() {
+        return posYOne;
+    }
+
+    public int getPosXTwo() {
+        return posXTwo;
+    }
+
+    public int getPosYTwo() {
+        return posYTwo;
+    }
+    
+    
 }
