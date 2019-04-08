@@ -16,8 +16,9 @@ import Model.Enums.TileType;
  */
 public class Game {
 
-    public static final int MAP_HEIGHT = 22;
     public static final int MAP_WIDTH = 46;
+    public static final int MAP_HEIGHT = 22;
+    
 
     private TileType[][] map = new TileType[MAP_WIDTH][MAP_HEIGHT];
 

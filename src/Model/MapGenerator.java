@@ -31,6 +31,8 @@ public class MapGenerator {
     private final int[][] rockStartNodes;
     private final Current[] currents;
     private final TileType[][] map;
+    private final int[][] coloredMap;
+    private int color;
 
     private Direction dirOne;
     private int posXOne;
@@ -48,6 +50,8 @@ public class MapGenerator {
         map = new TileType[MAP_WIDTH][MAP_HEIGHT];
         rockStartNodes = new int[rockCount][2];
         currents = new Current[currentCount];
+        coloredMap = new int[MAP_WIDTH][MAP_HEIGHT];
+        color = 1;
     }
 
     public void genMap() {
@@ -55,30 +59,102 @@ public class MapGenerator {
         generateRockNodes();
         generateCurrents();
         populateMap();
+        colorMap();
         genStartingPositions();
         genStartingDirections();
     }
+    
+    private void printColoredMap(){
+        for (int i = 0; i < MAP_HEIGHT; i++) {
+            for (int j = 0; j < MAP_WIDTH; j++) {
+                System.out.print(coloredMap[j][i] != -1 ? " "+coloredMap[j][i] : coloredMap[j][i]);
+            }
+            System.out.println("");
+        }
+    }
 
-    private void genStartingDirections(){
-        do{
+    private void colorMap() {
+        setupColoredMap();
+        int[] coords = findAColorlessCoord();
+        while (coords[0] != -1) {
+            colorACoord(coords[0], coords[1]);
+            coords = findAColorlessCoord();
+            color++;
+        }
+        printColoredMap();
+    }
+
+    private int[] findAColorlessCoord() {
+        int[] coords = {-1, -1};
+        for (int i = 0; i < MAP_HEIGHT; i++) {
+            for (int j = 0; j < MAP_WIDTH; j++) {
+                if (coloredMap[j][i] == 0) {
+                    coords[0] = j;
+                    coords[1] = i;
+                    return coords;
+                }
+            }
+        }
+        return coords;
+    }
+
+    private void setupColoredMap() {
+        for (int i = 0; i < MAP_HEIGHT; i++) {
+            for (int j = 0; j < MAP_WIDTH; j++) {
+                switch (map[j][i]) {
+                    case ROCK:
+                        coloredMap[j][i] = -1;
+                        break;
+                    default:
+                        coloredMap[j][i] = 0;
+                        break;
+                }
+            }
+        }
+    }
+
+    private void colorACoord(int x, int y) {
+        if (coloredMap[x][y] == 0) {
+            coloredMap[x][y] = color;
+            if (isValidCoord(x, y + 1)) {
+                colorACoord(x, y + 1);
+            }
+            if (isValidCoord(x, y - 1)) {
+                colorACoord(x, y - 1);
+            }
+            if (isValidCoord(x + 1, y)) {
+                colorACoord(x + 1, y);
+            }
+            if (isValidCoord(x - 1, y)) {
+                colorACoord(x - 1, y);
+            }
+        }
+    }
+
+    private void genStartingDirections() {
+        do {
             dirOne = randomDir();
             dirTwo = randomDir();
-        }while(!validDirections());
+        } while (!validDirections());
     }
-    
-    private boolean validDirections(){
-        boolean first = map[posXOne+dirOne.getX()][posYOne+dirOne.getY()] !=
-                TileType.ROCK;
-        boolean second = map[posXTwo+dirTwo.getX()][posYTwo+dirTwo.getY()] !=
-                TileType.ROCK;
-        return first && second;
+
+    private boolean validDirections() {
+        try {
+            boolean first = map[posXOne + dirOne.getX()][posYOne + dirOne.getY()]
+                    != TileType.ROCK;
+            boolean second = map[posXTwo + dirTwo.getX()][posYTwo + dirTwo.getY()]
+                    != TileType.ROCK;
+            return first && second;
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
     }
-    
+
     private void genStartingPositions() {
         do {
             randomizeCoords(1);
             randomizeCoords(2);
-        } while (!validShipDistance()/* && !shipsAreReachAble()*/);
+        } while (!validShipDistance() || !shipsAreReachAble());
     }
 
     private void randomizeCoords(int player) {
@@ -88,10 +164,10 @@ public class MapGenerator {
             rndX = rnd.nextInt(MAP_WIDTH);
             rndY = rnd.nextInt(MAP_HEIGHT);
         } while (!validStartingPos(rndX, rndY));
-        if(player == 1){
+        if (player == 1) {
             posXOne = rndX;
             posYOne = rndY;
-        }else if(player == 2){
+        } else if (player == 2) {
             posXTwo = rndX;
             posYTwo = rndY;
         }
@@ -102,7 +178,7 @@ public class MapGenerator {
     }
 
     private boolean shipsAreReachAble() {
-        return true;
+        return coloredMap[posXOne][posYOne] == coloredMap[posXTwo][posYTwo];
     }
 
     private boolean validShipDistance() {
@@ -214,10 +290,13 @@ public class MapGenerator {
         }
     }
 
-    private boolean isValidTile(int x, int y) {
+    private boolean isValidCoord(int x, int y) {
         return x >= 0 && x < MAP_WIDTH
-                && y >= 0 && y < MAP_HEIGHT
-                && map[x][y] == TileType.WATER;
+                && y >= 0 && y < MAP_HEIGHT;
+    }
+
+    private boolean isValidTile(int x, int y) {
+        return isValidCoord(x, y) && map[x][y] == TileType.WATER;
     }
 
     public Direction randomDir() {
@@ -255,6 +334,5 @@ public class MapGenerator {
     public int getPosYTwo() {
         return posYTwo;
     }
-    
-    
+
 }
