@@ -217,7 +217,7 @@ public class PirateGameServer {
     private void waitAndExit() {
         Thread wait = new Thread(() -> {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(2000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(PirateGameServer.class.getName()).log(Level.SEVERE, null, ex);
             }
