@@ -167,7 +167,6 @@ public class PirateGameServer {
             System.out.println("Message recieved");
         } catch (IOException e) {
             errorMessage(player);
-            waitAndExit();
         }
         return message;
     }
@@ -207,11 +206,7 @@ public class PirateGameServer {
         } else {
             writeToClient("ERROR:ERROR", game.getPlayerOne());
         }
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PirateGameServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        waitAndExit();
     }
 
     private void waitAndExit() {
@@ -226,7 +221,8 @@ public class PirateGameServer {
         try {
             wait.join();
         } catch (InterruptedException ex) {
-            Logger.getLogger(PirateGameServer.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("waitAndExit got interrupted");
+            System.exit(0);
         }
         System.exit(0);
     }

@@ -75,12 +75,12 @@ public class Game {
             checkMovementContact(MovementType.valueOf(actions2[0]),
                     route2, route1, 2, playerTwo, playerOne, set2, contact2);
         }
-        
+
         isGameEnded = checkWinner();
 
         processCurrent(playerOne, playerTwo, set1);
         processCurrent(playerTwo, playerOne, set2);
-        
+
         isGameEnded = checkWinner();
 
         //Action feldolgozások
@@ -211,21 +211,19 @@ public class Game {
     private void processCurrent(Player player, Player otherPlayer, StringBuilder set) {
         int x = player.getShip().getPosX();
         int y = player.getShip().getPosY();
-        int otherX = otherPlayer.getShip().getPosX();
-        int otherY = otherPlayer.getShip().getPosY();
         TileType tile = map[x][y];
         switch (tile) {
             case CURRENT_NORTH:
-                manageCurrentTile(player, tile, 0, 1, otherX, otherY, set);
+                manageCurrentTile(player, otherPlayer, tile, 0, -1, set);
                 break;
             case CURRENT_EAST:
-                manageCurrentTile(player, tile, 1, 0, otherX, otherY, set);
+                manageCurrentTile(player, otherPlayer, tile, 1, 0, set);
                 break;
             case CURRENT_SOUTH:
-                manageCurrentTile(player, tile, 0, -1, otherX, otherY, set);
+                manageCurrentTile(player, otherPlayer, tile, 0, 1, set);
                 break;
             case CURRENT_WEST:
-                manageCurrentTile(player, tile, -1, 0, otherX, otherY, set);
+                manageCurrentTile(player, otherPlayer, tile, -1, 0, set);
                 break;
             default:
                 appendCurrent(player, "NONE", set);
@@ -234,18 +232,24 @@ public class Game {
         set.append(";");
     }
 
-    private void manageCurrentTile(Player player, TileType tile,
-            int byX, int byY, int otherX, int otherY, StringBuilder set) {
+    private void manageCurrentTile(Player player, Player otherPlayer, TileType tile,
+            int byX, int byY, StringBuilder set) {
         int toX = player.getShip().getPosX() + byX;
         int toY = player.getShip().getPosY() + byY;
-        if (toX >= 0 && toX < MAP_WIDTH && toY >= 0 && toY < MAP_HEIGHT
-                && map[toX][toY] != TileType.ROCK
-                && toX != otherX && toY != otherY) {
-            player.getShip().floatBy(byX, byY);
-            appendCurrent(player, tile.toString(), set);
-        } else {
+        int otherX = otherPlayer.getShip().getPosX();
+        int otherY = otherPlayer.getShip().getPosY();
+        if (toX < 0 || toX >= MAP_WIDTH || toY < 0 || toY >= MAP_HEIGHT
+                || map[toX][toY] == TileType.ROCK
+                || (toX == otherX && toY == otherY
+                && map[otherX][otherY] == TileType.WATER)) {
             appendCurrent(player, "NONE", set);
             player.getShip().sufferDamage(1);
+            if (player.getShip().isWrecked() && !isGameEnded) {
+                otherPlayer.setWon(true);
+            }
+        } else {
+            player.getShip().floatBy(byX, byY);
+            appendCurrent(player, tile.toString(), set);
         }
     }
 
@@ -295,9 +299,9 @@ public class Game {
                             set.append("SHOOTHIT").append(",")
                                     .append(x).append(",").append(y).append(";");
                             otherPlayer.getShip().sufferDamage(1);
-                            if (otherPlayer.getShip().isWrecked() &&
-                                !isGameEnded) {
-                                    player.setWon(true);
+                            if (otherPlayer.getShip().isWrecked()
+                                    && !isGameEnded) {
+                                player.setWon(true);
                             }
                             shot = true;
                             break;
