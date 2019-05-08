@@ -10,7 +10,7 @@ package Model;
  * @author kismo
  */
 public class Direction {
-    String dir;
+    private String dir;
     private int x;
     private int y;
     

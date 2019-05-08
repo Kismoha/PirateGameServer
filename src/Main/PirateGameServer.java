@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pirategameserver;
+package Main;
 
 import Model.Game;
 import Model.Player;
@@ -21,8 +21,6 @@ import java.util.logging.Logger;
  * @author kismoha
  */
 public class PirateGameServer {
-
-    public static final int MAX_PLAYERS = 2;
     public static final int PORT = 65535;
 
     private ServerSocket server;
@@ -97,8 +95,6 @@ public class PirateGameServer {
             Socket connection = server.accept();
             System.out.println("Connection");
             game.setPlayerTwo(new Player(connection));
-            game.getPlayerTwo().getShip().setPosX(2);
-            game.getPlayerTwo().getShip().setPosY(2);
         } catch (IOException e) {
             e.printStackTrace();
         }

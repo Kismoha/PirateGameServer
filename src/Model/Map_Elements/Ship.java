@@ -144,6 +144,11 @@ public abstract class Ship {
         grapples += ammount;
     }
     
+    protected void init(){
+        resetMovementSlots();
+        initMovementAmmount();
+    }
+    
     public ShipType getType() {
         return type;
     }

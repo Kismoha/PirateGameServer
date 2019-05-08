@@ -21,8 +21,8 @@ public class Game {
 
     private TileType[][] map = new TileType[MAP_WIDTH][MAP_HEIGHT];
 
-    Player playerOne;
-    Player playerTwo;
+    private Player playerOne;
+    private Player playerTwo;
 
     private GameState state;
     private boolean isGameEnded;

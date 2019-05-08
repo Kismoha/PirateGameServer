@@ -25,7 +25,7 @@ public class Sloop extends Ship{
         this.shotPerAction = 1;
         this.maxLoadedGuns = 8;
         this.currentLoadedGuns = 6;
-        this.grapples = 4;
+        this.grapples = 2;
         
         this.speed = 3;
         this.movementSlots = new MovementType[MOVEMENT_SLOTS];
@@ -38,11 +38,5 @@ public class Sloop extends Ship{
         this.direction = new Direction("SOUTH");
         
         init();
-        
-    }
-    
-    private void init(){
-        resetMovementSlots();
-        initMovementAmmount();
     }
 }
